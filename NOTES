@@ -1,0 +1,2 @@
+python3 main.py downloader --classes Apple Orange --type_csv validation --multiclasses 1 --dpath /ds/OID_V4 --opath foo
+

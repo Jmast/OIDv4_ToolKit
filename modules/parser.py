@@ -13,6 +13,10 @@ def parser_arguments():
     parser.add_argument('--Dataset', required=False,
                         metavar="/path/to/OID/csv/",
                         help='Directory of the OID dataset folder')
+    parser.add_argument('--dpath', required=False, default="",
+                        help="Downloaded & extracted path to images (where train/validate/test dirs are located)")
+    parser.add_argument('--opath', required=False, default="",
+                        help="subfolder name to store output")
     parser.add_argument('--classes', required=False, nargs='+',
                         metavar="list of classes",
                         help="Sequence of 'strings' of the wanted classes")

@@ -51,6 +51,7 @@ def mkdirs(Dataset_folder, csv_folder, classes, type_csv):
             else:
                 folder = os.path.join(Dataset_folder, type_csv, class_name)
             if not os.path.exists(folder):
+                print("... making dir: {}".format(folder))
                 os.makedirs(folder)
             filelist = [f for f in os.listdir(folder) if f.endswith(".txt")]
             for f in filelist:

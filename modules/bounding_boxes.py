@@ -95,9 +95,11 @@ def bounding_boxes_images(args, DEFAULT_OID_DIR):
 
 			class_list = args.classes
 			print(bc.INFO + 'Downloading {} together.'.format(class_list) + bc.ENDC)
-			multiclass_name = ['_'.join(class_list)]
+			if args.opath:
+				multiclass_name = [args.opath]
+			else:
+				multiclass_name = ['_'.join(class_list)]
 			mkdirs(dataset_dir, csv_dir, multiclass_name, args.type_csv)
-
 			error_csv(name_file_class, csv_dir)
 			df_classes = pd.read_csv(CLASSES_CSV, header=None)
 

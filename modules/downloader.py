@@ -39,12 +39,12 @@ def download(args, df_val, folder, dataset_dir, class_name, class_code, class_li
     else:
         class_name_list = class_name
         
-    download_img(folder, dataset_dir, class_name_list, images_list, threads)
+    download_img(args.dpath, args.opath, folder, dataset_dir, class_name_list, images_list, threads)
     if not args.sub:
-        get_label(folder, dataset_dir, class_name, class_code, df_val, class_name_list, args)
+        get_label(args.opath, folder, dataset_dir, class_name, class_code, df_val, class_name_list, args)
 
 
-def download_img(folder, dataset_dir, class_name, images_list, threads):
+def download_img(dpath, opath, folder, dataset_dir, class_name, images_list, threads):
     '''
     Download the images.
     :param folder: train, validation or test
@@ -54,8 +54,11 @@ def download_img(folder, dataset_dir, class_name, images_list, threads):
     :param threads: number of threads
     :return: None
     '''
-    image_dir = folder
-    download_dir = os.path.join(dataset_dir, image_dir, class_name)
+    image_dir = os.path.join(dpath, folder)
+    opath = opath or class_name
+    download_dir = os.path.join(dataset_dir, folder, opath)
+    if not os.path.exists(download_dir):
+        os.makedirs(download_dir)
     downloaded_images_list = [f.split('.')[0] for f in os.listdir(download_dir)]
     images_list = list(set(images_list) - set(downloaded_images_list))
 
@@ -66,7 +69,8 @@ def download_img(folder, dataset_dir, class_name, images_list, threads):
         commands = []
         for image in images_list:
             path = image_dir + '/' + str(image) + '.jpg ' + '"' + download_dir + '"'
-            command = 'aws s3 --no-sign-request --only-show-errors cp s3://open-images-dataset/' + path                        
+            # command = 'aws s3 --no-sign-request --only-show-errors cp s3://open-images-dataset/' + path
+            command = 'ln -s ' + path
             commands.append(command)
 
         list(tqdm(pool.imap(os.system, commands), total = len(commands) ))
@@ -78,7 +82,7 @@ def download_img(folder, dataset_dir, class_name, images_list, threads):
         print(bc.INFO + 'All images already downloaded.' +bc.ENDC)
 
 
-def get_label(folder, dataset_dir, class_name, class_code, df_val, class_list, args):
+def get_label(opath, folder, dataset_dir, class_name, class_code, df_val, class_list, args):
     '''
     Make the label.txt files
     :param folder: trai, validation or test
@@ -94,11 +98,13 @@ def get_label(folder, dataset_dir, class_name, class_code, df_val, class_list, a
 
         image_dir = folder
         if class_list is not None:
-            download_dir = os.path.join(dataset_dir, image_dir, class_list)
-            label_dir = os.path.join(dataset_dir, folder, class_list, 'Label')
+            opath = opath or class_list
+            download_dir = os.path.join(dataset_dir, image_dir, opath)
+            label_dir = os.path.join(dataset_dir, folder, opath, 'Label')
         else:
-            download_dir = os.path.join(dataset_dir, image_dir, class_name)
-            label_dir = os.path.join(dataset_dir, folder, class_name, 'Label')
+            opath = opath or class_name
+            download_dir = os.path.join(dataset_dir, image_dir, opath)
+            label_dir = os.path.join(dataset_dir, folder, opath, 'Label')
 
         downloaded_images_list = [f.split('.')[0] for f in os.listdir(download_dir) if f.endswith('.jpg')]
         images_label_list = list(set(downloaded_images_list))
